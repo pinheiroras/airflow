@@ -1,0 +1,78 @@
+DAG - directed Acyclic Graph
+
+
+- Action Operatos
+- Transfer Operators
+- Sensor Operators
+
+- BashOperator
+- PythonOperator
+- EmptyOperator
+- ShortCircuitOperator
+- BranchDateTimeOperator
+- BranchDayOfWeekOperator
+- EmailOperator
+
+
+BashOperator
+	task1 = BashOperator(
+		task_id = "print_date",
+		bash_command = "date"
+	)
+
+	task2 = BashOperator(
+		task_id = "sleep",
+		depends_on_past=False,
+		bash_command = "sleep 5",
+		retries = 3,
+	)
+
+PythonOperator
+	obter = PythonOperator(
+		task_id = "obter",
+		python_callable = _obter,
+		provide_context = True,
+		params = { 'data_pagamento': '2023-09-01'},
+	)
+	consolidar = PythonOperator(
+		task_id = "consolidar",
+		python_callable = _consolidar,
+		provide_context = True,
+	)
+
+EmailOperator	
+  email_consolidado = EmailOperator(
+    task_id = "email_consolidado",
+    to=[destinatario],
+    subject='Consolidados de recebiveis {{params.data_pagamento}}',
+    html_content=()
+      'Consolidado dos recebiveis esperados para '
+      '{{params.data_pagamento}}:<br><br>'
+      "<b>Valor total :</b> R$ {{ti.xcom_pull(key='valor_total')}}<br>"
+      "<b>Taxas:</b> R$ {{ti.xcom_pull(key='valor_taxas')}}<br>"
+    ),
+    files=None,
+    params={"data_pagamento" = "2023-09-01"}
+  )
+
+	t4= EmailOperator(
+				task_id=t4,
+				to='test@mail.com',
+				subject='Alert Mail',
+				html_content=""" Mail Test """,
+				dag=dag
+	)
+
+- build 
+- teste
+- bash ( criar uma pasta , criar um arquivo e salvar dados log )
+- 
+
+
+xcom :
+
+put
+	kwargs['ti'].xcom_push(key='recebiveis', value=df)
+get
+	df = kwargs['ti'].xcom_pull(key='recebiveis')
+
